@@ -1,0 +1,30 @@
+---
+import { evidence } from '../data/evidence';
+import type { Lang } from '../data/profile';
+interface Props { lang: Lang; group: 'service' | 'planning'; }
+const { lang, group } = Astro.props;
+const list = evidence.filter(e => e.group === group);
+---
+<div class:list={['evidence-section', { 'project-evidence': group === 'planning' }]}>
+  <h3>{lang === 'en' ? 'A closer look' : '经历与成果记录'}</h3>
+  <p class="evidence-intro">{lang === 'en' ? 'Select a photograph to view it in detail. Student IDs are concealed in the website copies.' : '点击图片放大查看。网站副本中的学号已遮挡。'}</p>
+  <div class="evidence-grid">{list.map(e => <figure class="evidence-card"><button type="button" class="evidence-trigger" data-caption={lang === 'en' ? e.en : e.zh} aria-label={lang === 'en' ? `Enlarge: ${e.en}` : `放大查看：${e.zh}`}><img src={`${import.meta.env.BASE_URL}images/${e.id}.webp`} alt={lang === 'en' ? e.en : e.zh} loading="lazy" width="1200" height={e.group === 'planning' ? '860' : '1650'} /></button><figcaption>{lang === 'en' ? e.en : e.zh}<small>{lang === 'en' ? e.enNote : e.zhNote}</small></figcaption></figure>)}</div>
+</div>
+<dialog class="evidence-dialog" aria-label={lang === 'en' ? 'Photograph viewer' : '图片查看器'}><button type="button" class="dialog-close" aria-label={lang === 'en' ? 'Close photograph' : '关闭图片'}>×</button><img alt="" /><p class="dialog-caption"></p></dialog>
+<script>
+  document.querySelectorAll<HTMLDialogElement>('.evidence-dialog').forEach(dialog => {
+    const section = dialog.previousElementSibling;
+    const image = dialog.querySelector('img')!;
+    const caption = dialog.querySelector('.dialog-caption')!;
+    section?.querySelectorAll<HTMLButtonElement>('.evidence-trigger').forEach(button => {
+      button.addEventListener('click', () => {
+        const source = button.querySelector('img')!;
+        image.src = source.src; image.alt = source.alt;
+        caption.textContent = button.dataset.caption || '';
+        dialog.showModal();
+      });
+    });
+    dialog.querySelector('.dialog-close')?.addEventListener('click', () => dialog.close());
+    dialog.addEventListener('click', e => { if (e.target === dialog) { const rect = dialog.getBoundingClientRect(); if (e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom) dialog.close(); } });
+  });
+</script>

@@ -1,0 +1,59 @@
+---
+import '../styles/global.css';
+import Icon from '../components/Icon.astro';
+import { profile, type Lang } from '../data/profile';
+interface Props { lang: Lang; title?: string; description?: string; projectSlug?: string; }
+const { lang, title, description, projectSlug } = Astro.props;
+const t = profile[lang];
+const base = import.meta.env.BASE_URL;
+const home = lang === 'zh' ? `${base}zh/` : base;
+const other = lang === 'en' ? `${base}zh/${projectSlug ? `projects/${projectSlug}/` : ''}` : `${base}${projectSlug ? `projects/${projectSlug}/` : ''}`;
+const pageTitle = title ? `${title} | ${profile.name}` : `${profile.name} | ${lang === 'en' ? 'Personal Portfolio' : '个人网站'}`;
+const desc = description || t.intro;
+const configuredSite = Astro.site && !['localhost', '127.0.0.1'].includes(Astro.site.hostname);
+const canonical = configuredSite ? new URL(Astro.url.pathname, Astro.site) : undefined;
+const sections = ['about', 'education', 'experience', 'projects', 'skills', 'contact'];
+---
+<!doctype html>
+<html lang={lang === 'zh' ? 'zh-CN' : 'en'}>
+  <head>
+    <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title><meta name="description" content={desc} /><meta name="theme-color" content="#164c46" />
+    <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
+    {canonical && <link rel="canonical" href={canonical} />}
+    <link rel="alternate" hreflang={lang === 'en' ? 'zh-CN' : 'en'} href={new URL(other, Astro.site)} />
+    <meta property="og:title" content={pageTitle} /><meta property="og:description" content={desc} /><meta property="og:type" content="website" /><meta property="og:locale" content={lang === 'zh' ? 'zh_CN' : 'en_US'} />
+    <meta property="og:image" content={new URL(`${base}images/portrait.webp`, Astro.site)} /><meta property="og:image:alt" content="Portrait of Nazhakaiti Yusufu" />
+    {canonical && <meta property="og:url" content={canonical} />}
+    <meta name="twitter:card" content="summary" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">{lang === 'en' ? 'Skip to content' : '跳至正文'}</a>
+    <header class="header">
+      <div class="header-inner">
+        <a class="brand" href={home} aria-label={`${profile.name} — ${lang === 'en' ? 'Home' : '首页'}`}><span class="brand-mark" aria-hidden="true">✧</span><span>Nazhakaiti<span class="brand-sub">YUSUFU</span></span></a>
+        <nav id="main-nav" aria-label={lang === 'en' ? 'Main navigation' : '主导航'}>
+          {sections.map((section, i) => <a href={`${home}#${section}`}>{t.nav[i]}</a>)}
+        </nav>
+        <div class="header-actions"><a class="language" href={other} lang={lang === 'en' ? 'zh-CN' : 'en'} aria-label={lang === 'en' ? '切换到中文' : 'Switch to English'}><Icon name="globe" /><span>{lang === 'en' ? '中文' : 'EN'}</span></a><button class="menu-button" type="button" aria-controls="main-nav" aria-expanded="false" aria-label={lang === 'en' ? 'Toggle navigation' : '展开或收起导航'}><Icon name="menu" /></button></div>
+      </div>
+    </header>
+    <main id="main"><slot /></main>
+    <footer class="footer"><a class="footer-name" href={home}>{profile.name}</a><p>{t.footer}</p><a href="#main">{lang === 'en' ? 'Back to top ↑' : '返回顶部 ↑'}</a></footer>
+    <script>
+      const menu = document.querySelector<HTMLButtonElement>('.menu-button');
+      const nav = document.querySelector('#main-nav');
+      menu?.addEventListener('click', () => {
+        const open = menu.getAttribute('aria-expanded') !== 'true';
+        menu.setAttribute('aria-expanded', String(open));
+        nav?.classList.toggle('open', open);
+      });
+      nav?.querySelectorAll('a').forEach(a => a.addEventListener('click', () => { nav.classList.remove('open'); menu?.setAttribute('aria-expanded', 'false'); }));
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && menu?.getAttribute('aria-expanded') === 'true') { nav?.classList.remove('open'); menu.setAttribute('aria-expanded', 'false'); menu.focus(); } });
+      if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver(entries => entries.forEach(entry => { if (entry.isIntersecting) { document.querySelectorAll('#main-nav a').forEach(a => a.classList.toggle('active', a.getAttribute('href')?.endsWith(`#${entry.target.id}`) || false)); } }), { rootMargin: '-15% 0px -65% 0px' });
+        document.querySelectorAll('section[id]').forEach(section => observer.observe(section));
+      }
+    </script>
+  </body>
+</html>

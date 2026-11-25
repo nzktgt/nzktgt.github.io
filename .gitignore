@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.astro/
+.env
+.env.*
+!.env.example
+*.log
+.verification/
+# Source materials stay local. Publish only prepared assets in public/.
+/*.jpg
+/*.pdf
+deliverables/

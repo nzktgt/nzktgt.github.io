@@ -1,0 +1,22 @@
+---
+import { render, type CollectionEntry } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+import Icon from './Icon.astro';
+import Evidence from './Evidence.astro';
+import { profile } from '../data/profile';
+interface Props { entry: CollectionEntry<'projects'>; }
+const { entry } = Astro.props;
+const p = entry.data;
+const t = profile[p.lang];
+const { Content } = await render(entry);
+const home = p.lang === 'zh' ? `${import.meta.env.BASE_URL}zh/` : import.meta.env.BASE_URL;
+---
+<Layout lang={p.lang} title={p.title} description={p.summary} projectSlug={p.slug}>
+  <article class="project-detail container">
+    <a class="text-link back-link" href={`${home}#projects`}><Icon name="back" />{t.back}</a>
+    <div class="detail-header"><p class="eyebrow">0{p.order} / {p.category} · {p.date}</p><h1>{p.title}</h1><p class="detail-lead">{p.summary}</p><div class="tags">{p.tags.map(tag => <span>{tag}</span>)}</div></div>
+    <div class="detail-grid"><aside class="detail-aside"><span class="large-star" aria-hidden="true">✧</span><strong>{p.stat}</strong><p>{p.statLabel}</p><small>{t.projectNote}</small></aside><div class="prose"><Content /></div></div>
+    {p.slug === 'village-plan' && <Evidence lang={p.lang} group="planning" />}
+    <a class="button primary" href={`${home}#projects`}><Icon name="back" />{t.back}</a>
+  </article>
+</Layout>
