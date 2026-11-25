@@ -1,6 +1,6 @@
 # Nazhakaiti Yusufu — Personal Portfolio
 
-Astro 5 静态个人网站，默认英文，提供完整中文版本。当前仅在本地运行，未部署、未推送远程仓库。
+Astro 5 静态个人网站，默认英文，提供完整中文版本。发布目标为 https://nzktgt.github.io ，源码仓库为 https://github.com/nzktgt/nzktgt.github.io 。
 
 ## 本地预览
 
@@ -62,8 +62,10 @@ bun scripts/verify.mjs
 - 简历未提供具体生活爱好、LinkedIn或GitHub，因此尚未添加。
 - 规划项目展示成果册照片与获奖证书，未提供原始地图、数据或完整报告下载。
 
-## 未来部署（等待明确指令）
+## GitHub Pages 部署
 
-已准备 `.github/workflows/pages.yml`，仅支持在 GitHub 手动触发（没有 push 触发器）。当前没有创建远程仓库、推送或运行部署。
+`.github/workflows/pages.yml` 在推送到 `main` 后自动构建并部署，也可在 Actions 中手动触发。流程执行依赖安装、Astro 检查、生产构建及 Pages 发布。
 
-未来经本人确认后，配置 GitHub Pages 的 GitHub Actions 来源，首次远程推送和可见性设置须先确认。workflow 将从 Pages 配置读取 SITE_URL 与 BASE_PATH，兼容账户主页与项目子路径。正式域名配置后会生成对应 canonical 和 Open Graph 图片地址。不要用默认 localhost 地址构建公开版本。
+仓库的 Settings → Pages → Source 应设为 GitHub Actions。workflow 将从 Pages 配置读取 SITE_URL 与 BASE_PATH，生成正式 canonical 和 Open Graph 图片地址。不要用默认 localhost 地址构建公开版本。
+
+日后更新：修改文件 → 本地检查和构建 → Git 提交 → 推送 `main` → 等待 Actions 成功。原始 JPG、PDF 不会进入仓库，只有 public 中处理后的副本会发布。

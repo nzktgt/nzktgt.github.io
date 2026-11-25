@@ -1,5 +1,7 @@
-name: Deploy portfolio (manual only)
+name: Deploy portfolio
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 permissions:
   contents: read
@@ -18,6 +20,8 @@ jobs:
           bun-version: 1.4.2
       - uses: actions/configure-pages@v5
         id: pages
+        with:
+          enablement: true
       - run: bun install --frozen-lockfile
       - run: bun run check
       - run: bun run build
